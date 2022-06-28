@@ -4,7 +4,7 @@ import com.example.springdragoncommon.hbl.yms.web.conversion.utils.ConversionUti
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -53,9 +53,9 @@ public class MappingJsonToVoConfig implements WebMvcConfigurer {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //设置日期格式
         objectMapper.setDateFormat(ConversionUtils.smt);
-        JavaTimeModule javaTimeModule=new JavaTimeModule();
+        SimpleModule simpleModule=new SimpleModule();
         //添加反序列化器
-        javaTimeModule.addDeserializer(Date.class, new JsonDeserializer<Date>() {
+        simpleModule.addDeserializer(Date.class, new JsonDeserializer<Date>() {
             @Override
             public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
                 //获取web端传递的参数
@@ -64,7 +64,7 @@ public class MappingJsonToVoConfig implements WebMvcConfigurer {
                 return date;
             }
         });
-        objectMapper.registerModule(javaTimeModule);
+        objectMapper.registerModule(simpleModule);
         mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
         //设置中文编码格式
         List<MediaType> list = new ArrayList<MediaType>();

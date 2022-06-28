@@ -1,2 +1,4 @@
 org.springframework.context.ApplicationContextInitializer=\
 com.example.springdragoncommon.hbl.yms.spi.initializer.SpiApplicationContextInitializer
+org.springframework.context.ApplicationListener=\
+com.example.springdragoncommon.config.listener.MonitorMethodApplicationListener
