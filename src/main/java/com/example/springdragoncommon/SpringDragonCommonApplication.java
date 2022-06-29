@@ -3,6 +3,9 @@ package com.example.springdragoncommon;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * @author hanbl
+ */
 @SpringBootApplication
 public class SpringDragonCommonApplication {
 

@@ -1,0 +1,12 @@
+dragon:
+  common:
+    agent:
+      transformer:
+        transformers:
+          httptransformer:
+            class: com.example.springdragoncommon.common.agent.transformer.AgentClassTransformer
+            enable: true
+            canRetransform: true
+            arguments:
+              enhances:
+                -com.example.springdragoncommon.common.agent.enhance.impl.HttpClientSyncEnhance
