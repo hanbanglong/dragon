@@ -1,9 +1,12 @@
 package com.example.springdragoncommon.common.agent.bean;
 
 import com.example.springdragoncommon.common.agent.utils.AgentMapUtils;
+import com.example.springdragoncommon.common.agent.utils.BeanUtils;
+import com.example.springdragoncommon.common.agent.utils.ReflectionUtil;
+import org.springframework.util.StringUtils;
 
 import java.lang.instrument.ClassFileTransformer;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author hanbl
@@ -11,11 +14,11 @@ import java.util.Map;
 public class TransformerDefine {
     private String name;
 
-    private String claszName;
+    private String className;
 
     private boolean enable;
 
-    private boolean canRetransform;
+    private boolean canRetraceForm;
 
     private Map<String, Object> arguments;
 
@@ -29,12 +32,12 @@ public class TransformerDefine {
         this.name = name;
     }
 
-    public String getClaszName() {
-        return claszName;
+    public String getClassName() {
+        return className;
     }
 
-    public void setClaszName(String claszName) {
-        this.claszName = claszName;
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     public boolean isEnable() {
@@ -45,12 +48,12 @@ public class TransformerDefine {
         this.enable = enable;
     }
 
-    public boolean isCanRetransform() {
-        return canRetransform;
+    public boolean isCanRetraceForm() {
+        return canRetraceForm;
     }
 
-    public void setCanRetransform(boolean canRetransform) {
-        this.canRetransform = canRetransform;
+    public void setCanRetraceForm(boolean canRetraceForm) {
+        this.canRetraceForm = canRetraceForm;
     }
 
     public Map<String, Object> getArguments() {
@@ -62,6 +65,31 @@ public class TransformerDefine {
     }
 
     public ClassFileTransformer getInstance() {
+        if (this.instance!=null){
+            return this.instance;
+        }
+        synchronized (this){
+            if (this.instance!=null){
+                return this.instance;
+            }
+            this.instance = ReflectionUtil.createInstance(this.className);
+            if (this.arguments != null) {
+                Iterator<Map.Entry<String, Object>> it = this.arguments.entrySet().iterator();
+                try {
+                    while (it.hasNext()) {
+                        Map.Entry<String, Object> entry = it.next();
+                        String enhances = String.valueOf(entry.getValue());
+                        String[] enhanceList = enhances.split("-");
+                        List<String> enhancesNames = Arrays.asList(enhanceList);
+                        List<String> list=new ArrayList<>(enhancesNames);
+                        list.removeIf(e-> StringUtils.isEmpty(e));
+                        BeanUtils.setPropertyByMethod(this.instance, entry.getKey(), list);
+                    }
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(e);
+                }
+            }
+        }
         return instance;
     }
 
@@ -73,9 +101,9 @@ public class TransformerDefine {
     public static TransformerDefine build(String name, Map<String, Object> attributes) {
         TransformerDefine transformerDefine = new TransformerDefine();
         transformerDefine.setName(name);
-        transformerDefine.setClaszName(AgentMapUtils.getValue(attributes, "class"));
+        transformerDefine.setClassName(AgentMapUtils.getValue(attributes, "class"));
         transformerDefine.setEnable(AgentMapUtils.getValue(attributes, "enable"));
-        transformerDefine.setCanRetransform(AgentMapUtils.getValue(attributes, "canRetransform"));
+        transformerDefine.setCanRetraceForm(AgentMapUtils.getValue(attributes, "canRetransform"));
         transformerDefine.setArguments(AgentMapUtils.getValue(attributes, "arguments"));
         return transformerDefine;
     }

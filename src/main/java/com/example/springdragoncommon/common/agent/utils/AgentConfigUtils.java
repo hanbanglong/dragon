@@ -2,15 +2,14 @@ package com.example.springdragoncommon.common.agent.utils;
 
 import com.example.springdragoncommon.common.agent.bean.TransformerDefine;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.instrument.ClassFileTransformer;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,7 +24,7 @@ public class AgentConfigUtils {
 
     private Map<String, Object> config;
     private Map<String, TransformerDefine> transformerDefineMap = new ConcurrentHashMap<>();
-    private List<String> enhances = new ArrayList<>();
+    private List<String> transformerNames = new ArrayList<>();
 
     public AgentConfigUtils(Map<String, Object> config) {
         this.config = config;
@@ -42,16 +41,36 @@ public class AgentConfigUtils {
             parseTransformer(transformers);
         }
     }
-
+    private List<String> parseEnhances(Map<String, Object> enhances) {
+        Iterator<Map.Entry<String, Object>> iterator1 = enhances.entrySet().iterator();
+        ArrayList<String> enhancesNameList=null;
+        while (iterator1.hasNext()){
+            Map.Entry<String, Object> next = iterator1.next();
+            String value = String.valueOf(next.getValue());
+            String[] split = value.split("-");
+            List<String> enhancesNames = Arrays.asList(split);
+            enhancesNameList = new ArrayList<>(enhancesNames);
+            if (!CollectionUtils.isEmpty(enhancesNameList)){
+                enhancesNameList.removeIf(p->StringUtils.isEmpty(p));
+            }
+        }
+        return enhancesNameList;
+    }
 
     private void parseTransformer(Map<String, Object> transformers) {
         if (transformers != null && transformers.size() > 0) {
             Iterator<Map.Entry<String, Object>> iterator = transformers.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, Object> entry = iterator.next();
-                this.enhances.add(entry.getKey());
+                this.transformerNames.add(entry.getKey());
                 this.transformerDefineMap.put(entry.getKey(), TransformerDefine.build(entry.getKey(), (Map<String, Object>) entry.getValue()));
             }
+            TransformerDefine httpTransformer = transformerDefineMap.get("httptransformer");
+            ClassFileTransformer  instance= httpTransformer.getInstance();
+           /* if (instance instanceof AgentClassTransformer){
+                AgentClassTransformer agentClassTransformer=(AgentClassTransformer) instance;
+                //agentClassTransformer.setEnhances(agentClassTransformer.getEnhances());
+            }*/
         }
     }
 
@@ -60,6 +79,12 @@ public class AgentConfigUtils {
         return new AgentConfigUtils(parse(file));
     }
 
+    /**
+     * 读取路径下自定义的配置文件
+     * @param file
+     * @return
+     * @throws IOException
+     */
     public static Map<String, Object> parse(String file) throws IOException {
         //创建配置文件类
         Yaml yaml = new Yaml();
@@ -73,5 +98,20 @@ public class AgentConfigUtils {
                 inputStream.close();
             }
         }
+    }
+
+
+    public List<TransformerDefine> transformers() {
+        List<TransformerDefine> list = new ArrayList<>();
+
+        Set<Map.Entry<String, TransformerDefine>> sets = this.transformerDefineMap.entrySet();
+        Iterator<Map.Entry<String, TransformerDefine>> it = sets.iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, TransformerDefine> entry = it.next();
+            if (this.transformerNames.contains(entry.getKey())) {
+                list.add(entry.getValue());
+            }
+        }
+        return list;
     }
 }
