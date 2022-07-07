@@ -52,7 +52,7 @@ public class MappingJsonToVoConfig implements WebMvcConfigurer {
         // NULL不参与序列化
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //设置日期格式
-        objectMapper.setDateFormat(ConversionUtils.smt);
+        //objectMapper.setDateFormat(ConversionUtils.smt);
         SimpleModule simpleModule=new SimpleModule();
         //添加反序列化器
         simpleModule.addDeserializer(Date.class, new JsonDeserializer<Date>() {
