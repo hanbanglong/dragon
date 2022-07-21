@@ -27,4 +27,9 @@ public class ConversionController {
         return "保存成功！";
     }
 
+    @RequestMapping("queryDemo")
+    public String queryDemo(@RequestBody String name){
+        return "成功！！！！";
+    }
+
 }
