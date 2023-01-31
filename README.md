@@ -11,4 +11,4 @@
 则需要借助于ConverterFactory进行注册生效
 # 二、基于spi实现对外提供service接口
  此方式，可以让客户按照自己的意愿去实现定义的方法，自己程序中可以直接通过其类型添加list去循环实现客户的代码逻辑
-
+#hotupdateconfig文件基于cloud的refreshEnvironment的刷新机制，此处需要借助@RefreshScope注解
