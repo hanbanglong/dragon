@@ -9,7 +9,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertySource;
-import org.springframework.jdbc.core.JdbcTemplate;
+//import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
@@ -22,20 +22,20 @@ import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
 
-@Configuration
-@DependsOn("")
+//@Configuration
+//@DependsOn("")
 public class LoadConfigFromDb {
     private static Logger log= LoggerFactory.getLogger(LoadConfigFromDb.class);
 
     @Resource
     private ConfigurableEnvironment env;
 
-    @Qualifier("dbjdbc")
+   /* @Qualifier("dbjdbc")
     @Resource
-    private JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;*/
 
-    @PostConstruct
-    public void initializePropertySourceFromDb() {
+    //@PostConstruct
+   /* public void initializePropertySourceFromDb() {
         MutablePropertySources propertySources = env.getPropertySources();
         Map<String, Object> propertyMap = new ConcurrentHashMap<>(256);
         try {
@@ -73,5 +73,5 @@ public class LoadConfigFromDb {
 
         }
 
-    }
+    }*/
 }
